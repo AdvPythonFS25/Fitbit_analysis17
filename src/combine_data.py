@@ -14,10 +14,10 @@ class CSVData:
                 setattr(self, var_name, df)
 
 # Usage
-folder_path = "data/Folder_1/dataset"
+folder_path = "data/Folder_1"
 data_1 = CSVData(folder_path)
 
-folder_path = "data/Folder_1/dataset"
+folder_path = "data/Folder_2"
 data_2 = CSVData(folder_path)
 
 
@@ -25,6 +25,8 @@ class MergedData:
     def __init__(self, data_1, data_2):
         for attr in dir(data_1):
             if not attr.startswith("_") and isinstance(getattr(data_1, attr), pd.DataFrame):
+                print(f"Data from {attr}:")
+                print(getattr(data_1, attr).head())
                 df1 = getattr(data_1, attr)
                 df2 = getattr(data_2, attr, None)
                 if isinstance(df2, pd.DataFrame):

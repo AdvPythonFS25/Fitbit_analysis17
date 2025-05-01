@@ -31,11 +31,10 @@ Fitbit analysis/
 
 - ── data/folder_1 # CSV files (raw Fitbit data)
   - │──folder_2 # CSV files (raw Fitbit data)
-- ── scripts/ # Python scripts
+- ── src/ # Python scripts
 - │ ── combine_data.py # Data merging and cleaning
 - │ ── filter_data.py # Filtering and statistics
 - │ ── visualize_data.py # Visualization functions
-- ── members.txt # Names of group members
+- │ ── main.py # Entry point to run the analysis
 - ── requirements.txt # Python dependencies
 - ── README.md # Project overview
-- ── main.py # Entry point to run the analysis

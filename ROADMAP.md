@@ -16,7 +16,7 @@
 - [X] Load and inspect all .csv files
 - [X] Write `combine_data.py` to merge datasets into a single DataFrame
 - [X] Normalize date and user ID formats
-- [ ] Support data access at different resolutions (minute/hour/day)
+- [X] Support data access at different resolutions (minute/hour/day)
 
 ## Milestone 3: Core Functionality & Refactoring
 

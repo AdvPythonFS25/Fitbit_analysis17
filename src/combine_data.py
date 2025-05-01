@@ -1,3 +1,5 @@
+# Copyright (c) 2025 Micael Moreira Lemos, Gilles Reichenbach, Tobias Aubert, Nicolas Stettler	
+# This software is licensed under the MIT License
 '''
 This file combines all the data to a single dataframe
 '''

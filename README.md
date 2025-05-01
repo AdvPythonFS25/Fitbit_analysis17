@@ -22,7 +22,7 @@ This project provides a data analysis and visualization tool for Fitbit health d
 Run the Streamlit app with:
 
 ```bash
-streamlit run main.py
+streamlit run .\src\main.py
 ```
 
 ## Structure

@@ -24,8 +24,8 @@
 
 - [X] Write `filter_data.py` to allow data filtering by user/time
 - [X] Implement summary statistics (total steps, avg sleep duration, etc.)
-- [ ] Begin basic visualizations (time series plots)
-- [ ] Refactor codebase and improve modularity
+- [X] Begin basic visualizations (time series plots)
+- [X] Refactor codebase and improve modularity
 
 ## Milestone 4: Unit Testing & GitHub Issues
 

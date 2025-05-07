@@ -22,8 +22,8 @@
 
 **Deadline: May 8**
 
-- [ ] Write `filter_data.py` to allow data filtering by user/time
-- [ ] Implement summary statistics (total steps, avg sleep duration, etc.)
+- [X] Write `filter_data.py` to allow data filtering by user/time
+- [X] Implement summary statistics (total steps, avg sleep duration, etc.)
 - [ ] Begin basic visualizations (time series plots)
 - [ ] Refactor codebase and improve modularity
 

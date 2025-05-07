@@ -16,21 +16,14 @@ st.set_page_config(
 
 def run_app():
     """Main Streamlit app: focused on filtering and visualizing data."""
-    st.title("📊 Fitbit Data Visualizer & Analyzer")
+    st.title("Fitbit Data Visualizer & Analyzer")
     st.write("Select data resolution, user, and time range from the sidebar to explore visualizations and statistics.")
 
     data_filter = DataFilter(merged_data)
 
-    st.sidebar.header("🔍 Data Filters")
+    st.sidebar.header("Data Filters")
     
-    freq_options = ["daily", "hourly", "minutes"] # Assuming all are always available
-    # Simplified: directly use pre-defined options
-    # if hasattr(data_filter, 'daily_df') and not data_filter.daily_df.empty:
-    #     freq_options.append("daily")
-    # if hasattr(data_filter, 'hourly_df') and not data_filter.hourly_df.empty:
-    #     freq_options.append("hourly")
-    # if hasattr(data_filter, 'minutes_df') and not data_filter.minutes_df.empty:
-    #     freq_options.append("minutes")
+    freq_options = ["daily", "hourly", "minutes"] 
         
     freq = st.sidebar.selectbox("Select Data Resolution", freq_options, key="freq_select")
     
@@ -43,7 +36,7 @@ def run_app():
         id_options_list.append(merged_data.daily_df["Id"])
     
     all_ids_series = pd.concat(id_options_list).dropna().unique()
-    # Simplified ID sorting, assuming IDs are convertible for robust sorting
+
     try:
         if all(str(x).replace('.0','').isdigit() for x in all_ids_series):
                 sorted_ids_str = sorted([str(int(float(x))) for x in all_ids_series])
@@ -71,16 +64,16 @@ def run_app():
         current_df_for_dates = data_filter.daily_df
         time_col_for_dates = "ActivityDate"
     
-    # Assuming current_df_for_dates and time_col_for_dates are always valid
+
     date_times = pd.to_datetime(current_df_for_dates[time_col_for_dates], errors='coerce').dropna()
-    if not date_times.empty: # Keep this one check to avoid crashing date_input
+    if not date_times.empty: 
         min_date_val = date_times.min().date()
         max_date_val = date_times.max().date()
 
     start_date = st.sidebar.date_input("Start Date", value=min_date_val, min_value=min_date_val, max_value=max_date_val, key="start_date")
     end_date = st.sidebar.date_input("End Date", value=max_date_val, min_value=min_date_val, max_value=max_date_val, key="end_date")
 
-    # Removed start_date > end_date check
+
 
     start_time = pd.to_datetime(start_date)
     end_time = pd.to_datetime(end_date) + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)
@@ -92,7 +85,6 @@ def run_app():
         elif freq == "hourly": example_df_for_id_type = data_filter.hourly_df
         elif freq == "minutes": example_df_for_id_type = data_filter.minutes_df
         
-        # Assuming Id column exists and type conversion works
         id_dtype = example_df_for_id_type["Id"].dtype
         selected_id_typed = pd.Series(selected_id_str).astype(id_dtype).iloc[0]
 
@@ -105,12 +97,12 @@ def run_app():
             start_time=start_time, end_time=end_time, freq=freq
         )
 
-    # Assuming filtered_df is never empty
+
     st.subheader(f"Preview of Filtered {freq.capitalize()} Data (Max 100 Rows)")
     st.dataframe(filtered_df.head(100))
     
     st.markdown("---")
-    st.subheader("📊 Summary Statistics for Filtered Data")
+    st.subheader("Summary Statistics for Filtered Data")
     summary = SummaryStatistics(filtered_df)
     stats_values = {
         "Total Steps": summary.total_steps(),
@@ -121,14 +113,14 @@ def run_app():
     }
 
     for label, value in stats_values.items():
-        if value is not None: # Keep this check as stats methods can return None
+        if value is not None: 
             if isinstance(value, float):
                 st.write(f"{label}: {value:,.2f}")
             else:
                 st.write(f"{label}: {value:,}")
 
     st.markdown("---") 
-    st.subheader("📈 Visualizations for Filtered Data")
+    st.subheader("Visualizations for Filtered Data")
 
     time_col_plot = None
     if freq == "daily": time_col_plot = "ActivityDate"
@@ -139,21 +131,21 @@ def run_app():
     plot_df_copy[time_col_plot] = pd.to_datetime(plot_df_copy[time_col_plot], errors='coerce')
     plot_df_copy = plot_df_copy.dropna(subset=[time_col_plot])
 
-    # Assuming plot_df_copy is not empty and time_col_plot exists
+
     
     def generate_line_chart(df, data_col_name, chart_title_suffix, y_axis_label_for_display):
-        # Assuming data_col_name exists and has data
+
         st.markdown(f"##### {freq.capitalize()} {chart_title_suffix}")
         
         series_for_plotting = df.set_index(time_col_plot)[data_col_name].sort_index()
-        series_for_plotting = series_for_plotting[series_for_plotting.notna()] # Keep this data cleaning
+        series_for_plotting = series_for_plotting[series_for_plotting.notna()] 
 
         if selected_id_str == "All" and "Id" in df.columns and df['Id'].nunique() > 1:
             aggregated_series = df.groupby(time_col_plot)[data_col_name].mean().sort_index()
-            series_for_plotting = aggregated_series[aggregated_series.notna()] # Keep this
+            series_for_plotting = aggregated_series[aggregated_series.notna()] 
             st.caption(f"Showing average {y_axis_label_for_display.lower()} across all selected users per time point.")
         
-        # Assuming series_for_plotting is not empty
+
         st.line_chart(series_for_plotting, use_container_width=True)
         st.caption(f"Y-axis represents: {y_axis_label_for_display}")
 
@@ -163,9 +155,9 @@ def run_app():
         generate_line_chart(plot_df_copy, "TotalMinutesAsleep", "Total Minutes Asleep", "Minutes Asleep")
         
         activity_cols_daily = ['VeryActiveMinutes', 'FairlyActiveMinutes', 'LightlyActiveMinutes', 'SedentaryMinutes']
-        # Assuming all activity_cols_daily exist
+
         st.markdown("##### Average Daily Activity Distribution (Minutes)")
-        avg_activity_data = plot_df_copy[activity_cols_daily].mean().dropna() # Keep dropna
+        avg_activity_data = plot_df_copy[activity_cols_daily].mean().dropna() 
         st.bar_chart(avg_activity_data, use_container_width=True)
 
     elif freq == "hourly":

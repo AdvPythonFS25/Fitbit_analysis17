@@ -1,9 +1,31 @@
 # Copyright (c) 2025 Micael Moreira Lemos, Gilles Reichenbach, Tobias Aubert, Nicolas Stettler
 # This software is licensed under the MIT License
 
+"""filter_data.py
+
+Helpers for slicing the large merged Fitbit tables by user IDs and/or time
+ranges, as well as combining the two filters.
+
+All returned frames are *brand-new* copies; mutating them will not affect the
+original ``MergedData`` object.
+"""
+
 import pandas as pd
 
 class DataFilter:
+    """Fast, chainable filters for :class:`combine_data.MergedData`.
+
+    Parameters
+    ----------
+    merged_data : combine_data.MergedData
+        Instance whose ``minutes_df``, ``hourly_df`` and ``daily_df`` attributes
+        will be queried.
+
+    Raises
+    ------
+    ValueError
+        If an invalid ``freq`` argument is supplied to the time-range helpers.
+    """
     def __init__(self, merged_data):
         self.minutes_df = merged_data.minutes_df if hasattr(merged_data, 'minutes_df') else pd.DataFrame()
         self.hourly_df = merged_data.hourly_df if hasattr(merged_data, 'hourly_df') else pd.DataFrame()
@@ -11,6 +33,18 @@ class DataFilter:
         self.daily_df = merged_data.daily_df if hasattr(merged_data, 'daily_df') else pd.DataFrame()
 
     def filter_by_user(self, user_id):
+        """Return all three frames restricted to one user.
+
+        Parameters
+        ----------
+        user_id : int | str
+            Value of the *Id* column to match.
+
+        Returns
+        -------
+        dict[str, pandas.DataFrame]
+            Keys: ``"minutes"``, ``"hourly"``, ``"daily"``.
+        """
         # Ensure DataFrames are not empty and contain 'Id' column
         filtered_minutes = pd.DataFrame()
         if not self.minutes_df.empty and "Id" in self.minutes_df.columns:
@@ -31,6 +65,21 @@ class DataFilter:
         }
 
     def filter_by_time_range(self, start_time, end_time, freq="minutes"):
+        """Extract a calendar slice from one of the three master tables.
+
+        Parameters
+        ----------
+        start_time, end_time : str | pandas.Timestamp
+            Inclusive bounds (coerced with ``pd.to_datetime``).
+        freq : {"minutes", "hourly", "daily"}, default "minutes"
+            Which underlying table to query.
+
+        Returns
+        -------
+        pandas.DataFrame
+            New frame containing only the requested interval; empty if the
+            source has no matching data.
+        """
         df_to_filter = pd.DataFrame()
         time_col = None
 

@@ -1,13 +1,35 @@
 # Copyright (c) 2025 Micael Moreira Lemos, Gilles Reichenbach, Tobias Aubert, Nicolas Stettler	
 # This software is licensed under the MIT License
 '''
-This file combines all the data to a single dataframe
+Utilities for loading raw Fitbit CSV exports from two folders, merging them
+minute-, hour- and day-wise, and exposing the results as convenient attributes.
 '''
 
 import pandas as pd
 import os
 
 class CSVData:
+    """Load **all** CSV files in a folder into attributes of the instance.
+
+    Each file becomes a ``pandas.DataFrame`` attribute whose name is the
+    file-stem with spaces and dashes converted to underscores.
+
+    Parameters
+    ----------
+    folder_path : str | os.PathLike
+        Path to a directory that contains Fitbit CSV exports.
+
+    Attributes
+    ----------
+    <file_stem> : pandas.DataFrame
+        One attribute per CSV discovered. The attribute name equals the
+        filename without extension, with illegal identifier characters
+        replaced.
+
+    Notes
+    -----
+    The constructor never raises; it prints a message if a CSV cannot be read.
+    """
     def __init__(self, folder_path):
         for filename in os.listdir(folder_path):
             if filename.endswith(".csv"):
@@ -28,6 +50,31 @@ data_2 = CSVData(folder_path)
 
 
 class MergedData:
+    """Container that holds union-merged DataFrames from two :class:`CSVData`
+    loaders.
+
+    The constructor:
+
+    1. Collects the set-union of DataFrame-bearing attributes from *both*
+       ``data_1`` and ``data_2``.
+    2. For every common attribute, concatenates the two frames row-wise
+       (``pd.concat``). If an attribute exists in only one source it is copied
+       as-is.
+    3. Builds three convenience attributes — ``minutes_df``, ``hourly_df``,
+       ``daily_df`` — already deduplicated, dtype-fixed and timestamp-parsed.
+
+    Parameters
+    ----------
+    data_1, data_2 : CSVData
+        Two loaders representing separate export folders.
+
+    Attributes
+    ----------
+    <attr> : pandas.DataFrame
+        All merged per-file frames.
+    minutes_df, hourly_df, daily_df : pandas.DataFrame
+        Ready-to-use time-aligned master tables at the respective resolutions.
+    """
     def __init__(self, data_1, data_2):
         # Collect all attribute names from both data_1 and data_2 that are DataFrames
         attrs_data1 = {attr for attr in dir(data_1) if not attr.startswith("_") and isinstance(getattr(data_1, attr), pd.DataFrame)}

@@ -1,6 +1,15 @@
 # Copyright (c) 2025 Micael Moreira Lemos, Gilles Reichenbach, Tobias Aubert, Nicolas Stettler
 # This software is licensed under the MIT License
 
+"""visualize_data.py
+
+Streamlit front-end for interactively filtering Fitbit data and showing both
+summary numbers and time-series charts.
+
+The module exposes a single public function ``run_app()`` so it can be imported
+from ``main.py`` without causing Streamlit to execute on import elsewhere.
+"""
+
 import streamlit as st
 import pandas as pd
 from combine_data import merged_data 
@@ -15,7 +24,15 @@ st.set_page_config(
 )
 
 def run_app():
-    """Main Streamlit app: focused on filtering and visualizing data."""
+    """Launch the Streamlit dashboard.
+
+    The GUI consists of three vertical panes:
+
+    1. **Sidebar** – resolution, user and date-range selectors  
+    2. **Data preview** – up to 100 filtered rows (``st.dataframe``)  
+    3. **Statistics & plots** – key metrics plus interactive charts
+    """
+
     st.title("Fitbit Data Visualizer & Analyzer")
     st.write("Select data resolution, user, and time range from the sidebar to explore visualizations and statistics.")
 
@@ -134,7 +151,19 @@ def run_app():
 
     
     def generate_line_chart(df, data_col_name, chart_title_suffix, y_axis_label_for_display):
+        """Wrapper around :pyfunc:`st.line_chart` with common styling.
 
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Already filtered and properly time-indexed DataFrame.
+        data_col_name : str
+            Column to plot on the Y-axis.
+        chart_title_suffix : str
+            Text appended to the automatic title prefix.
+        y_axis_label_for_display : str
+            Human-readable label inserted into captions.
+        """
         st.markdown(f"##### {freq.capitalize()} {chart_title_suffix}")
         
         series_for_plotting = df.set_index(time_col_plot)[data_col_name].sort_index()
